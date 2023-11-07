@@ -1,6 +1,7 @@
 use rust_closures::*;
 
-fn make_closure(db: DB) -> impl Fn(i32) -> Item {
+fn make_closure(db: DBSync) -> impl Fn(i32) -> Item {
+    let mut db = db.clone();
     move |id:i32| {
         db.get_item_sync(id)
     }
@@ -10,7 +11,7 @@ fn make_closure(db: DB) -> impl Fn(i32) -> Item {
 
 #[tokio::main]
 async fn main() {
-    let db = DB;
+    let db = DBSync::new("/tmp/test");
 
     let cl = make_closure(db);
 

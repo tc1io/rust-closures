@@ -1,18 +1,18 @@
+mod syn;
+mod asyn;
+
+pub use syn::DBSync;
+pub use asyn::DBAsync;
+
+
 // Some item to get from database. It is our
 // domain entity, it is Clone, Send, Sync
 #[derive(Debug)]
-pub struct Item(i32);
+pub struct Item(String);
 
-// Some dependency that offers a sync. and async.
-// retrieval method. It is Clone, Send and Sync
-#[derive(Clone)]
-pub struct DB;
-impl DB {
-    pub fn get_item_sync(&self, id:i32) -> Item {
-         Item(id)
+impl From<&str> for Item {
+    fn from(value: &str) -> Self {
+        Item(String::from(value))
     }
-    pub async fn get_item_async(&self, id:i32) -> Item {
-        Item(id)
-    }
-
 }
+
