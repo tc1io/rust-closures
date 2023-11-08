@@ -9,4 +9,5 @@ edition = "2021"
 tokio = { version = "1", features = ["macros", "full"] }
 forceps = "0.4.1"
 mhdb = "1.0.3"
+futures-util = "*"
 

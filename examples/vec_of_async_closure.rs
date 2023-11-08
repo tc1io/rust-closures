@@ -1,7 +1,10 @@
 #![feature(impl_trait_in_fn_trait_return)]
 //#![feature(async_closure)]
 use std::future::Future;
+use futures_util::future::FutureExt;
+use futures_util::future::BoxFuture;
 use rust_closures::*;
+use core::pin::Pin;
 
 pub trait Callback {
     type Output;
@@ -23,7 +26,7 @@ impl<F, R> Callback for F
 
 
 
-fn make_closure_async(db: DBAsync) -> impl Fn(i32) -> impl Future<Output=Item> {
+fn make_closure_async(db: DBAsync) -> impl Fn(i32) -> Pin<Box<dyn Future<Output=Item>>> {
     // move |id:i32| {
     //     let c = db.clone();
     //     async move {
@@ -36,7 +39,7 @@ fn make_closure_async(db: DBAsync) -> impl Fn(i32) -> impl Future<Output=Item> {
         async move {
             c.put_item_async(id,Item::from("my item")).await;
             c.get_item_async(id).await
-        }
+        }.boxed()
     }
 
     // let c = db.clone();
@@ -56,7 +59,7 @@ fn make_closure_async(db: DBAsync) -> impl Fn(i32) -> impl Future<Output=Item> {
 async fn main() {
     let db = DBAsync::new("/tmp/cache").await;
 
-    let v:Vec<Box<dyn Callback<Output=Future<Output=Item>>>> = Vec::new();
+    let v:Vec<Box<dyn Callback<Output=Box<dyn Future<Output=Item>>>>> = Vec::new();
 
     let cl0 = make_closure_async(db);
     let cl1 = make_closure_async(db);
